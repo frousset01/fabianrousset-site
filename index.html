@@ -6,12 +6,26 @@
   <title>Fabian Rousset | Safety, Operations & People Leader</title>
   <meta name="description" content="Fabian Rousset is a safety, operations, and people leader with experience supporting large-scale solar installation operations, EHS programs, training, and organizational improvement." />
   <style>
-    :root {
-  --dark-blue: #041b4d;
-  --primary-blue: #2563eb;
-  --light-blue: #dbeafe;
-  --background-blue: #f0f7ff;
-  --hover-blue: #1d4ed8;
+   :root {
+  --bg: #f0f7ff;
+  --text: #1f2937;
+
+  --accent: #2563eb;
+  --accent-dark: #1d4ed8;
+
+  --card: #ffffff;
+
+  --border: #dbeafe;
+
+  --muted: #4b5563;
+
+  --hero-bg: linear-gradient(
+    135deg,
+    #eff6ff 0%,
+    #dbeafe 100%
+  );
+
+  --shadow: 0 12px 30px rgba(37, 99, 235, 0.10);
 }
 
     * {
@@ -33,9 +47,20 @@
     }
 
     header {
-      padding: 28px 0;
-      border-bottom: 1px solid var(--border);
-    }
+  padding: 28px 0;
+
+  border-bottom: 1px solid var(--border);
+
+  background: white;
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 1000;
+
+  backdrop-filter: blur(10px);
+}
 
     nav {
       display: flex;
@@ -69,13 +94,21 @@
       text-decoration: underline;
     }
 
-    .hero {
-      padding: 86px 0 64px;
-      display: grid;
-      grid-template-columns: 1.4fr 0.8fr;
-      gap: 44px;
-      align-items: center;
-    }
+   .hero {
+  padding: 86px 50px 64px;
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
+  gap: 44px;
+  align-items: center;
+
+  background: var(--hero-bg);
+
+  border-radius: 30px;
+
+  margin-top: 40px;
+
+  box-shadow: var(--shadow);
+}
 
     .eyebrow {
       color: var(--accent);
@@ -106,20 +139,41 @@
     }
 
     .button {
-      display: inline-block;
-      padding: 13px 18px;
-      border-radius: 999px;
-      background: var(--accent);
-      color: white;
-      font-weight: 700;
-      border: 2px solid var(--accent);
-    }
+  display: inline-block;
 
+  padding: 14px 22px;
+
+  border-radius: 999px;
+
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #1d4ed8
+  );
+
+  color: white;
+
+  font-weight: 700;
+
+  border: none;
+
+  box-shadow: 0 10px 20px rgba(37,99,235,0.25);
+
+  transition: 0.3s ease;
+}
     .button:hover {
-      background: var(--accent-dark);
-      color: white;
-      text-decoration: none;
-    }
+  transform: translateY(-2px);
+
+  background: linear-gradient(
+    135deg,
+    #1d4ed8,
+    #1e40af
+  );
+
+  color: white;
+
+  text-decoration: none;
+}
 
     .button.secondary {
       background: transparent;
@@ -173,13 +227,22 @@
     }
 
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 12px 30px rgba(31, 41, 51, 0.05);
-    }
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
 
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.08);
+
+  transition: 0.3s ease;
+}
+.card:hover {
+  transform: translateY(-6px);
+
+  border-color: var(--accent);
+
+  box-shadow: 0 18px 35px rgba(37, 99, 235, 0.18);
+}
     .card h3 {
       margin-bottom: 10px;
       font-size: 1.08rem;
@@ -195,10 +258,7 @@
     }
 
     .experience {
-      background: #fffaf2;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
+  background: #eff6ff;
 
     .experience-list {
       display: grid;
