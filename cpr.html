@@ -34,13 +34,34 @@
   width: min(1080px, 92%);
   margin: 0 auto;
 }
+    .container {
+  width: min(1080px, 92%);
+  margin: 0 auto;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 18px;
+  font-size: 0.95rem;
+  flex-wrap: wrap;
+}
     header {
       background: white;
       padding: 28px 40px;
       border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       flex-wrap: wrap;
       position: sticky;
       top: 0;
@@ -270,17 +291,32 @@
 <body>
 
 <header>
-  <div class="logo"><img src="https://i.imgur.com/hzTQ4Pu.png"
-                      alt="Fabian Rousset"
-      style="width: 300px; height: 100px; border-radius: 0px; object-fit: scale-down; margin-bottom: 0px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);"
-    ></div>
+  <div class="container">
 
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="cpr.html">CPR Classes</a>
-    <a href="index.html#about">About</a>
-    <a href="index.html#contact">Contact</a>
-  </nav>
+    <nav>
+
+      <div class="logo">
+        <img
+          src="https://i.imgur.com/hzTQ4Pu.png"
+          alt="Fabian Rousset"
+          style="
+            width: 300px;
+            height: 50px;
+            object-fit: contain;
+          "
+        >
+      </div>
+
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="cpr.html">CPR Classes</a>
+        <a href="index.html#about">About</a>
+        <a href="index.html#contact">Contact</a>
+      </div>
+
+    </nav>
+
+  </div>
 </header>
 
 <div class="hero container">
