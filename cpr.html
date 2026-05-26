@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>CPR Classes | Fabian Rousset</title>
+  <meta name="description" content="Red Cross First Aid, CPR, AED, bloodborne pathogens, anaphylaxis, and opioid overdose training with Fabian Rousset." />
+
+  <style>
+
+    :root {
+      --bg: #f0f7ff;
+      --text: #1f2937;
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --navy: #041b4d;
+      --card: #ffffff;
+      --border: #dbeafe;
+      --muted: #4b5563;
+      --hero-bg: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      --cta-bg: linear-gradient(135deg, #041b4d, #1d4ed8);
+      --shadow: 0 12px 30px rgba(37, 99, 235, 0.10);
+      --shadow-hover: 0 18px 35px rgba(37, 99, 235, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .container {
+      width: min(1080px, 92%);
+      margin: 0 auto;
+    }
+
+    header {
+      padding: 10px 0;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo img {
+      width: 260px;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-size: 0.95rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a,
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .nav-links a:hover,
+    a:hover {
+      color: var(--accent-dark);
+      text-decoration: underline;
+    }
+
+    .hero {
+      margin-top: 40px;
+      padding: 50px;
+      display: grid;
+      grid-template-columns: 1.35fr 0.85fr;
+      gap: 44px;
+      align-items: center;
+      background: var(--hero-bg);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero.has-image {
+      padding: 0;
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+
+    .hero-content,
+    .hero-text {
+      min-width: 0;
+    }
+
+    .hero.has-image .hero-text {
+      padding: 56px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.8rem;
+    }
+
+    h1,
+    .hero-text h2 {
+      font-size: clamp(2.35rem, 6vw, 4.5rem);
+      line-height: 1.05;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+
+    .hero p,
+    .hero-text p {
+      font-size: 1.18rem;
+      color: var(--muted);
+      max-width: 720px;
+      margin-bottom: 28px;
+    }
+
+    .blue-line {
+      width: 120px;
+      height: 5px;
+      background: var(--accent);
+      margin-bottom: 28px;
+      border-radius: 20px;
+    }
+
+    .hero-image {
+      height: 100%;
+      min-height: 520px;
+      overflow: hidden;
+    }
+
+    .hero-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .button,
+    .hero-button,
+    .email-button {
+      display: inline-block;
+      padding: 14px 22px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: white;
+      font-weight: 700;
+      border: none;
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
+      transition: 0.3s ease;
+    }
+
+    .button:hover,
+    .hero-button:hover,
+    .email-button:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, var(--accent-dark), #1e40af);
+      color: white;
+      text-decoration: none;
+    }
+
+    .button.secondary {
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+      box-shadow: none;
+    }
+
+    .button.secondary:hover {
+      background: rgba(37, 99, 235, 0.08);
+      color: var(--accent-dark);
+    }
+
+    section {
+      padding: 58px 0;
+    }
+
+    .section-title,
+    section h2 {
+      font-size: clamp(2rem, 4vw, 2.4rem);
+      margin-bottom: 18px;
+      color: var(--text);
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .section-intro {
+      color: var(--muted);
+      max-width: 760px;
+      margin-bottom: 30px;
+      font-size: 1.05rem;
+    }
+
+    .section-intro.center {
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 820px;
+      font-size: 1.15rem;
+    }
+
+    .grid,
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .cards {
+      gap: 24px;
+    }
+
+    .card,
+    .profile-card,
+    .experience-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.08);
+    }
+
+    .card {
+      padding: 24px;
+      transition: 0.3s ease;
+    }
+
+    .cards .card {
+      padding: 28px;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: var(--accent);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+      font-size: 1.12rem;
+      color: var(--accent);
+    }
+
+    .cards .card h3 {
+      margin-bottom: 14px;
+      font-size: 1.3rem;
+    }
+
+    .card p,
+    .card li,
+    .experience-item p,
+    .profile-card ul {
+      color: var(--muted);
+    }
+
+    .card ul {
+      padding-left: 18px;
+    }
+
+    .profile-card {
+      padding: 28px;
+      text-align: center;
+    }
+
+    .profile-photo {
+      width: 220px;
+      height: 220px;
+      border-radius: 20px;
+      object-fit: cover;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .profile-card h2 {
+      font-size: 1.15rem;
+      margin-bottom: 16px;
+    }
+
+    .profile-card ul {
+      list-style: none;
+      display: grid;
+      gap: 12px;
+    }
+
+    .experience,
+    .who-section {
+      background: #eff6ff;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .experience-list {
+      display: grid;
+      gap: 18px;
+    }
+
+    .experience-item {
+      padding: 26px;
+    }
+
+    .experience-item h3 {
+      margin-bottom: 8px;
+      color: var(--accent);
+    }
+
+    .who-box {
+      background: #eff6ff;
+      border: 1px solid var(--border);
+      border-radius: 25px;
+      padding: 50px;
+      box-shadow: var(--shadow);
+    }
+
+    .cta {
+      background: var(--cta-bg);
+      color: white;
+      border-radius: 24px;
+      padding: 50px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .cta h2 {
+      color: white;
+      margin-bottom: 18px;
+    }
+
+    .cta p {
+      font-size: 1.2rem;
+      margin-bottom: 28px;
+    }
+
+    .contact {
+      text-align: center;
+      padding-bottom: 78px;
+    }
+
+    .contact .section-intro {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    footer {
+      padding: 24px 0;
+      border-top: 1px solid var(--border);
+      background: white;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .hero.has-image {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 38px;
+      }
+
+      .hero.has-image .hero-text {
+        padding: 38px;
+      }
+
+      .hero-image {
+        min-height: 360px;
+      }
+
+      .grid,
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .who-box,
+      .cta {
+        padding: 34px 24px;
+      }
+    }
+
+    @media (max-width: 800px) {
+      header {
+        padding: 12px 0;
+      }
+
+      nav {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .logo img {
+        width: 220px;
+      }
+
+      .nav-links {
+        width: 100%;
+        gap: 12px;
+        font-size: 0.9rem;
+      }
+
+      .hero,
+      .hero.has-image {
+        margin-top: 24px;
+        border-radius: 24px;
+      }
+
+      h1,
+      .hero-text h2 {
+        font-size: clamp(2.15rem, 12vw, 3rem);
+      }
+
+      .profile-photo {
+        width: 180px;
+        height: 180px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .container {
+        width: min(100% - 28px, 1080px);
+      }
+
+      .hero,
+      .hero.has-image .hero-text {
+        padding: 28px 22px;
+      }
+
+      .hero.has-image {
+        padding: 0;
+      }
+
+      .hero-image {
+        min-height: 280px;
+      }
+
+      .nav-links a {
+        font-size: 0.88rem;
+      }
+
+      .buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .button,
+      .hero-button,
+      .email-button {
+        text-align: center;
+      }
+
+      section {
+        padding: 42px 0;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <a class="logo" href="index.html" aria-label="Fabian Rousset home">
+          <img src="https://i.imgur.com/hzTQ4Pu.png" alt="Fabian Rousset">
+        </a>
+
+        <div class="nav-links">
+          <a href="index.html">Home</a>
+          <a href="cpr.html">CPR Classes</a>
+          <a href="index.html#about">About</a>
+          <a href="index.html#contact">Contact</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero has-image container">
+      <div class="hero-text">
+        <div class="eyebrow">Red Cross Training • First Aid • CPR • AED</div>
+
+        <h1>First Aid, CPR<br>& AED Training</h1>
+
+        <div class="blue-line"></div>
+
+        <p>
+          Practical, professional Red Cross training that gives you the skills and confidence to respond in real emergencies.
+        </p>
+
+        <a class="hero-button" href="mailto:fabian@fabianrousset.com">
+          Request a Class
+        </a>
+      </div>
+
+      <div class="hero-image">
+        <img src="https://i.imgur.com/z6hOH27.png" alt="CPR training class with students practicing on a manikin">
+      </div>
+    </section>
+
+    <section class="container">
+      <h2 class="section-title center">Training Available</h2>
+
+      <p class="section-intro center">
+        I provide safety-focused emergency response training designed to be clear, practical, and easy to apply in workplaces and communities.
+      </p>
+
+      <div class="cards">
+        <div class="card">
+          <h3>First Aid</h3>
+          <p>Basic first aid response for common injuries, sudden illness, bleeding, burns, shock, and other emergencies.</p>
+        </div>
+
+        <div class="card">
+          <h3>CPR</h3>
+          <p>Hands-on CPR training focused on recognizing cardiac emergencies and responding quickly and confidently.</p>
+        </div>
+
+        <div class="card">
+          <h3>AED</h3>
+          <p>Training on how to safely and effectively use an automated external defibrillator during a cardiac emergency.</p>
+        </div>
+
+        <div class="card">
+          <h3>Bloodborne Pathogens</h3>
+          <p>Workplace-focused training on exposure risks, prevention practices, cleanup awareness, and protective measures.</p>
+        </div>
+
+        <div class="card">
+          <h3>Anaphylaxis</h3>
+          <p>Training on recognizing severe allergic reactions and understanding emergency response steps including epinephrine awareness.</p>
+        </div>
+
+        <div class="card">
+          <h3>Opioid Overdose</h3>
+          <p>Training on recognizing opioid overdose symptoms and understanding emergency response actions including naloxone awareness.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="who-box">
+        <h2 class="section-title center">Who This Is For</h2>
+
+        <div class="cards">
+          <div class="card">
+            <h3>Workplaces</h3>
+            <p>Help employees become more prepared to respond to medical emergencies at work.</p>
+          </div>
+
+          <div class="card">
+            <h3>Small Businesses</h3>
+            <p>Convenient training options for teams that need practical emergency response preparation.</p>
+          </div>
+
+          <div class="card">
+            <h3>Community Groups</h3>
+            <p>Useful for coaches, parents, volunteers, youth programs, and local organizations.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="container">
+      <div class="cta">
+        <h2>Schedule a Class</h2>
+
+        <p>
+          For class availability, group training, or questions, contact me directly.
+        </p>
+
+        <a class="email-button" href="mailto:fabian@fabianrousset.com">
+          fabian@fabianrousset.com
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      © <span id="year"></span> Fabian Rousset. All rights reserved.
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
