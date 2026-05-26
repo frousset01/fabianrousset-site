@@ -257,34 +257,41 @@ nav {
       border-top: 1px solid var(--border);
     }
 
-    @media (max-width: 900px) {
-      header {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 15px;
-      }
+    @media (max-width: 800px) {
+  header {
+    padding: 12px 0;
+  }
 
-      nav a {
-        margin-left: 0;
-        margin-right: 16px;
-      }
+  nav {
+    gap: 12px;
+  }
 
-      .hero {
-        grid-template-columns: 1fr;
-      }
+  .logo img {
+    width: 220px !important;
+    height: auto !important;
+    display: block;
+  }
 
-      .hero-text {
-        padding: 40px;
-      }
+  .nav-links {
+    width: 100%;
+    gap: 12px;
+    font-size: 0.9rem;
+  }
 
-      .hero-image {
-        min-height: 360px;
-      }
+  .hero {
+    padding-top: 35px;
+    gap: 28px;
+  }
 
-      .who-section {
-        padding: 30px;
-      }
-    }
+  h1 {
+    font-size: 2.4rem;
+  }
+
+  .profile-card img {
+    width: 180px !important;
+    height: 180px !important;
+  }
+}
   </style>
 </head>
 
