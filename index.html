@@ -298,25 +298,41 @@
       text-align: center;
     }
 
-    @media (max-width: 800px) {
-      nav {
-        align-items: flex-start;
-        flex-direction: column;
-      }
+@media (max-width: 800px) {
+  header {
+    padding: 12px 0;
+  }
 
-      .hero {
-        grid-template-columns: 1fr;
-        padding-top: 56px;
-      }
+  nav {
+    gap: 12px;
+  }
 
-      .grid {
-        grid-template-columns: 1fr;
-      }
+  .logo img {
+    width: 220px !important;
+    height: auto !important;
+    display: block;
+  }
 
-      .nav-links {
-        flex-wrap: wrap;
-      }
-    }
+  .nav-links {
+    width: 100%;
+    gap: 12px;
+    font-size: 0.9rem;
+  }
+
+  .hero {
+    padding-top: 35px;
+    gap: 28px;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+  }
+
+  .profile-card img {
+    width: 180px !important;
+    height: 180px !important;
+  }
+}
   </style>
 </head>
 <body>
@@ -325,7 +341,7 @@
 <nav>
   <div class="logo"><img src="https://i.imgur.com/hzTQ4Pu.png"
                       alt="Fabian Rousset"
-      style="width: 300px; height: 100px; border-radius: 0px; object-fit: scale-down; margin-bottom: 0px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);"
+      style="width: 260px; height: auto; display: block; object-fit: contain;"; border-radius: 0px; object-fit: scale-down; margin-bottom: 0px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);"
     ></div>
 
   <div class="nav-links">
