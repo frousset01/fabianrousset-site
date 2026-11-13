@@ -205,15 +205,15 @@ const groceryCatalog=[
  [/coconut milk/i,2.6,'can',1,2.6],[/coconut oil/i,.35,'Tbsp',32,9],[/shallot/i,.7,'each',1,.7],
  [/ginger/i,.28,'Tbsp',12,3.3],[/garlic/i,.16,'Tbsp',20,2.5],
  [/serrano|jalapeño|red chili|green chili/i,.3,'each',1,.3],[/bell pepper/i,1.4,'each',1,1.4],
- [/curry paste/i,.62,'Tbsp',8,4.8],[/pumpkin|butternut squash/i,.9,'cup',5,4.5],
+ [/curry paste/i,.62,'Tbsp',8,4.8],[/teriyaki sauce/i,.32,'Tbsp',16,5],[/hoisin sauce/i,.38,'Tbsp',16,6],[/sesame oil/i,.45,'Tbsp',16,7],[/sesame seeds/i,.2,'Tbsp',24,4.8],[/white wine vinegar|rice vinegar/i,.15,'Tbsp',32,4.8],[/pumpkin|butternut squash/i,.9,'cup',5,4.5],
  [/maple syrup/i,.52,'Tbsp',24,11],[/coconut sugar/i,.27,'Tbsp',32,6],
  [/turmeric/i,.15,'tsp',20,3.5],[/sea salt|salt/i,.025,'tsp',100,2.5],
  [/coconut aminos/i,.48,'Tbsp',16,7.5],[/tamari|soy sauce/i,.22,'Tbsp',20,4],
  [/broccoli/i,.85,'cup',5,4.2],[/lemon juice/i,.24,'Tbsp',12,3],
  [/cashews/i,2.5,'cup',4,9.5],[/cilantro|basil|parsley|mint|dill/i,1.5,'bunch',1,1.5],
- [/brown rice|white rice|quinoa/i,.7,'cup',8,5.6],
+ [/brown rice|white rice|long grain rice|quinoa/i,.7,'cup',8,5.6],
  [/chicken/i,4.5,'lb',2,9],[/ground beef|beef|steak/i,8,'lb',1,8],[/pork/i,4.2,'lb',2,8.4],
- [/shrimp|salmon|fish/i,9,'lb',1,9],[/cheese|mozzarella|cheddar|parmesan/i,4,'lb',1,4],
+ [/shrimp|salmon|fish/i,11,'lb',1,11],[/cheese|mozzarella|cheddar|parmesan/i,4,'lb',1,4],
  [/butter/i,4.5,'lb',1,4.5],[/almond milk|oat milk/i,4,'gallon',.5,4],
  [/milk/i,4.5,'gallon',1,4.5],[/eggs?|egg whites/i,.35,'each',12,4.2],
  [/green onions?|scallions?/i,.95,'bunch',1,.95],[/onions?/i,.85,'each',1,.85],
@@ -254,6 +254,7 @@ function ingredientEstimate(line,factor){
  let unit=groceryUnit(unitMatch?.[2]||'each');
  // An ingredient with no quantity (e.g. 'fresh basil or cilantro') is a garnish allowance.
  if(qty===null){
+  if(/\bwater\b/i.test(raw))return {used:0,checkout:0,estimated:true};
   if(found[2]==='bunch')return {used:1.5,checkout:1.5,estimated:true};
   if(/to taste|optional|garnish|pinch/i.test(raw))return {used:.35,checkout:1,estimated:true};
   return null;
@@ -268,6 +269,7 @@ function ingredientEstimate(line,factor){
  if(converted===null){
   // Common count-based produce and approximate kitchen yields.
   if(unit==='each'&&found[2]==='cup'&&/lemon juice/i.test(raw))converted=qty*3;
+  else if(unit==='each'&&found[2]==='Tbsp'&&/ginger/i.test(raw))converted=qty*.5;
   else if(unit==='each'&&found[2]==='Tbsp'&&/garlic/i.test(raw))converted=qty/3;
   else if(unit==='each'&&found[2]==='cup'&&/pumpkin|squash/i.test(raw))converted=qty*4;
   else if(unit==='each'&&found[2]==='each')converted=qty;
@@ -295,9 +297,9 @@ function renderShopping(){
  const used=rows.reduce((n,x)=>n+x.cost.used,0),checkout=rows.reduce((n,x)=>n+x.cost.checkout,0),missing=rows.flatMap(x=>x.cost.missing);
  return `<section class="panel"><h2>${t('shopping')}</h2><p>${esc(e.name)} · ${e.invited.length} guests · ${eq().toFixed(2)} adult-equivalent servings</p>
  <p class="small">Recipe quantities use adult-equivalent guests divided by original recipe servings. Grocery prices are static US planning assumptions, not live quotes. Checkout costs round up to typical packages, and may overestimate if you already have pantry items or use the same package for multiple recipes. No extra-food buffer is included.</p>
- ${rows.length?`<div class="summary"><h3>Estimated ingredient value: ${dollars(used*.8)}–${dollars(used*1.3)}</h3><h3>Estimated grocery checkout: ${dollars(checkout*.8)}–${dollars(checkout*1.3)}${missing.length?' + unpriced items':''}</h3><p class="small">Approximate package purchases, not a store quote. ${missing.length?missing.length+' ingredient(s) could not be priced confidently and are excluded.':''}</p></div>`:''}
+ ${rows.length?`<div class="summary"><h3>${missing.length?'Partial ingredient estimate':'Estimated ingredient value'}: ${dollars(used*.8)}–${dollars(used*1.3)}</h3><h3>${missing.length?'Partial checkout estimate':'Estimated grocery checkout'}: ${dollars(checkout*.8)}–${dollars(checkout*1.3)}${missing.length?' + unpriced items':''}</h3><p class="small">Approximate package purchases, not a store quote. ${missing.length?missing.length+' ingredient(s) could not be priced confidently and are excluded.':''}</p></div>`:''}
  ${rows.map(({r,factor,cost,lines})=>`<div class="summary"><h3>${esc(r.name)}</h3><p class="small">${factor.toFixed(2)}× original recipe · Original serves ${r.servings} · Serves ${eq().toFixed(2)} adult-equivalents</p>
- <p><strong>Ingredients used: ${cost.covered?dollars(cost.used*.8)+'–'+dollars(cost.used*1.3):'Not available'}</strong> · <strong>Estimated checkout: ${cost.covered?dollars(cost.checkout*.8)+'–'+dollars(cost.checkout*1.3):'Not available'}</strong></p>
+ <p><strong>${cost.missing.length?'Partial ingredient estimate':'Ingredients used'}: ${cost.covered?dollars(cost.used*.8)+'–'+dollars(cost.used*1.3):'Not available'}</strong> · <strong>${cost.missing.length?'Partial checkout estimate':'Estimated checkout'}: ${cost.covered?dollars(cost.checkout*.8)+'–'+dollars(cost.checkout*1.3):'Not available'}</strong></p>
  ${cost.approx? `<p class="small">${cost.approx} item(s) priced using a garnish or seasoning allowance.</p>`:''}
  ${cost.missing.length?`<p class="small">Not included in estimate: ${cost.missing.map(x=>esc(x)).join('; ')}</p>`:''}
  <ul>${lines.map(x=>`<li>${esc(x.line)}${x.numeric?'':' <small class="small">(check quantity)</small>'}</li>`).join('')}</ul></div>`).join('')||'<p>Choose recipes for the menu first.</p>'}
