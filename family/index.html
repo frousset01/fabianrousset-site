@@ -153,11 +153,45 @@ function parseQty(token){
  for(let p of parts){if(/^\d+\/\d+$/.test(p)){let [a,b]=p.split('/').map(Number);if(!b)return null;v+=a/b}else if(/^\d+(\.\d+)?$/.test(p))v+=Number(p);else return null}
  return v;
 }
+function kitchenFraction(value){
+ const whole=Math.floor(value), eighths=Math.round((value-whole)*8);
+ const n=whole+Math.floor(eighths/8),rem=eighths%8;
+ const fractions=['','⅛','¼','⅜','½','⅝','¾','⅞'];
+ return n+(rem?(n?' ':'')+fractions[rem]:'')||'0';
+}
+function kitchenAmount(amount,unit){
+ // Keep calculated amounts visible to avoid hiding rounding.
+ const u=unit.toLowerCase().replace(/\.$/,'');
+ let cups=null;
+ if(['tsp','teaspoon','teaspoons'].includes(u))cups=amount/48;
+ else if(['tbsp','tablespoon','tablespoons','tbs'].includes(u))cups=amount/16;
+ else if(['cup','cups'].includes(u))cups=amount;
+ if(cups===null)return null;
+ let val,displayUnit;
+ if(cups>=0.5){val=cups;displayUnit='cup'}
+ else if(cups*16>=1){val=cups*16;displayUnit='Tbsp'}
+ else {val=cups*48;displayUnit='tsp'}
+ const rounded=kitchenFraction(val);
+ const singular=Math.abs(val-1)<0.06;
+ const label=displayUnit==='cup'?(singular?'cup':'cups'):displayUnit;
+ return rounded+' '+label;
+}
 function scaleLine(line,factor){
  const match=line.match(/^(\s*)((?:\d+(?:\.\d+)?\s+)?(?:\d+\/\d+|[½⅓⅔¼¾⅛])|\d+(?:\.\d+)?(?:\s+[½⅓⅔¼¾⅛])?)(\s+.*)$/);
  if(!match)return {line,numeric:false};
  let n=parseQty(match[2]);if(n===null)return {line,numeric:false};
- return {line:match[1]+Number((n*factor).toFixed(2)).toString()+match[3],numeric:true};
+ const scaled=n*factor;
+ const rest=match[3];
+ const unitMatch=rest.match(/^(\s*)(tsp\.?|teaspoons?|tbsp\.?|tbs\.?|tablespoons?|cups?)\b(.*)$/i);
+ if(unitMatch){
+  const converted=kitchenAmount(scaled,unitMatch[2]);
+  const originalUnit=unitMatch[2];
+  const originalLabel=Number(scaled.toFixed(2))+' '+originalUnit;
+  if(converted && (converted!==originalLabel)){
+   return {line:match[1]+converted+unitMatch[3]+' ('+originalLabel+')',numeric:true};
+  }
+ }
+ return {line:match[1]+Number(scaled.toFixed(2)).toString()+rest,numeric:true};
 }
 function recipeMultiplier(r,kind,pct){
  // Recipes list their own serving yields; use those instead of estimated cooked weight.
