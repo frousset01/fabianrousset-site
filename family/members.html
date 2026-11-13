@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Manage Family Members</title>
+<style>body{font:16px system-ui,sans-serif;background:#f7f7f0;color:#273b30;margin:0}main{max-width:750px;margin:32px auto;padding:20px}h1{color:#315b45}a{color:#315b45}.member{background:#fff;border:1px solid #d5dfd8;border-radius:12px;padding:16px;margin:12px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.muted{color:#66746b;font-size:14px}button{border:0;border-radius:8px;padding:10px 14px;background:#315b45;color:white;cursor:pointer}button:disabled{opacity:.45;cursor:default}.danger{background:#9b4141}.controls{display:flex;gap:8px;flex-wrap:wrap}#status{padding:10px 0;white-space:pre-wrap}</style></head>
+<body><main><p><a href="./">← Back to Our Family Gatherings</a></p><h1>Manage Family Members</h1><p>Approve or revoke access to the private family application. Only approved administrators can use this page.</p><p id="status" role="status">Checking administrator access…</p><section id="members"></section></main>
+<script type="module">
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+const db=createClient('https://sncuplksqadovxuxyjhc.supabase.co','sb_publishable_bRzkmoLnyt3sUl0Kk_6cKg_LETSyD7s');
+const status=document.getElementById('status'), list=document.getElementById('members');
+const msg=t=>status.textContent=t;
+let myId=null;
+async function refresh(){
+ const {data:{user},error:ue}=await db.auth.getUser();
+ if(ue||!user){msg('Please sign in at the family home page first.');return}
+ myId=user.id;
+ const {data:self,error:se}=await db.from('family_members').select('role,approved').eq('user_id',myId).maybeSingle();
+ if(se||!self?.approved||self.role!=='admin'){msg('Administrator access required.');return}
+ const {data:members,error}=await db.from('family_members').select('user_id,display_name,role,approved,created_at').order('created_at',{ascending:false});
+ if(error){msg('Unable to load members: '+error.message);return}
+ msg(members.length+' registered account(s) · '+members.filter(m=>!m.approved).length+' awaiting approval');
+ list.replaceChildren();
+ for(const m of members){
+  const item=document.createElement('article');item.className='member';
+  const info=document.createElement('div');
+  const name=document.createElement('strong');name.textContent=m.display_name||'Family member';
+  const detail=document.createElement('div');detail.className='muted';detail.textContent=(m.approved?'Approved':'Awaiting approval')+' · '+m.role+(m.user_id===myId?' · Your account':'');
+  info.append(name,detail);item.append(info);
+  const actions=document.createElement('div');actions.className='controls';
+  const btn=document.createElement('button');btn.textContent=m.approved?'Revoke access':'Approve member';btn.className=m.approved?'danger':'';
+  btn.disabled=m.user_id===myId;
+  btn.onclick=async()=>{
+   const action=m.approved?'revoke access for':'approve';
+   if(!confirm('Are you sure you want to '+action+' '+(m.display_name||'this account')+'?'))return;
+   btn.disabled=true;
+   const {error}=await db.from('family_members').update({approved:!m.approved}).eq('user_id',m.user_id);
+   if(error){alert('Unable to update: '+error.message);btn.disabled=false;return}
+   await refresh();
+  };
+  actions.append(btn);item.append(actions);list.append(item);
+ }
+}
+refresh();
+</script></body></html>
