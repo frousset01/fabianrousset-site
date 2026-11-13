@@ -199,13 +199,45 @@ function recipeMultiplier(r,kind,pct){
  // Plate percentages affect food-weight planning, not recipe ingredient quantities.
  return eq()/Math.max(1,Number(r.servings)||1);
 }
+// Rough US grocery-budget reference prices, not live store quotes.
+const groceryPrices=[
+ [/coconut milk/i,2.6,'can'],[/coconut oil/i,0.4,'Tbsp'],[/shallot/i,0.65,'each'],[/ginger/i,0.28,'Tbsp'],[/garlic/i,0.15,'Tbsp'],[/chili|serrano|jalapeño/i,0.25,'each'],[/bell pepper/i,1.4,'each'],[/curry paste/i,0.65,'Tbsp'],[/pumpkin|butternut/i,0.95,'cup'],[/maple syrup/i,0.55,'Tbsp'],[/turmeric/i,0.13,'tsp'],[/salt/i,0.03,'tsp'],[/coconut aminos|soy sauce|tamari/i,0.45,'Tbsp'],[/broccoli/i,0.85,'cup'],[/lemon juice/i,0.25,'Tbsp'],[/cashews/i,2.4,'cup'],[/rice/i,0.65,'cup'],[/cilantro|basil/i,1.5,'bunch'],[/chicken/i,4.5,'lb'],[/beef|steak/i,8,'lb'],[/pork/i,4.2,'lb'],[/shrimp/i,9,'lb'],[/cheese/i,4,'lb'],[/butter/i,4.5,'lb'],[/milk/i,4.5,'gallon'],[/egg/i,0.35,'each'],[/onion/i,0.85,'each'],[/potato/i,0.7,'lb'],[/tomato/i,0.9,'each'],[/carrot/i,0.35,'each'],[/flour/i,0.3,'cup'],[/sugar/i,0.25,'cup'],[/olive oil/i,0.55,'Tbsp'],[/vegetable oil/i,0.16,'Tbsp'],[/pasta/i,1.7,'lb']
+];
+function ingredientEstimate(line,factor){
+ const match=line.match(/^\s*((?:\d+(?:\.\d+)?\s+)?(?:\d+\/\d+|[½⅓⅔¼¾⅛])|\d+(?:\.\d+)?(?:\s+[½⅓⅔¼¾⅛])?)(\s+.*)$/);
+ if(!match)return null;
+ const qty=parseQty(match[1]);if(qty===null)return null;
+ const rest=match[2],found=groceryPrices.find(x=>x[0].test(rest));if(!found)return null;
+ const unit=rest.trim().match(/^(tsp|teaspoons?|tbsp|tablespoons?|cups?|cans?|lbs?|pounds?|oz|ounces?|gallons?)\b/i)?.[1]?.toLowerCase()||'each';
+ const normalized=u=>({tsp:'tsp',teaspoon:'tsp',teaspoons:'tsp',tbsp:'Tbsp',tablespoon:'Tbsp',tablespoons:'Tbsp',cup:'cup',cups:'cup',can:'can',cans:'can',lb:'lb',lbs:'lb',pound:'lb',pounds:'lb',gallon:'gallon',gallons:'gallon'})[u]||u;
+ const from=normalized(unit),to=found[2];
+ let multiplier=1;
+ if(from!==to){
+  const tbsp={tsp:1/3,Tbsp:1,cup:16};
+  if(tbsp[from]&&tbsp[to])multiplier=tbsp[from]/tbsp[to];
+  else if(from==='oz'&&to==='lb')multiplier=1/16;
+  else if(from==='each'&&to==='can'&&/coconut milk/i.test(rest))multiplier=1;
+  else return null;
+ }
+ return qty*factor*multiplier*found[1];
+}
+function recipeCostEstimate(r,factor){
+ const lines=r.ingredients.split('\n').filter(x=>x.trim());
+ let total=0,covered=0;
+ for(const line of lines){const cost=ingredientEstimate(line,factor);if(cost!==null){total+=cost;covered++}}
+ return {total,covered,missing:lines.length-covered};
+}
+function dollars(n){return '$'+Math.round(n).toLocaleString('en-US')}
 function renderShopping(){
  let e=currentParty(),m=e.menu,entries=[{id:m.main,kind:'main',pct:m.pcts[0]},...m.sides.map((id,i)=>({id,kind:'side',pct:m.pcts[i+1]})),{id:m.dessert,kind:'dessert',pct:0}].filter(x=>x.id);
+ const rows=entries.map(entry=>{let r=recipe(entry.id);if(!r)return null;let factor=recipeMultiplier(r,entry.kind,entry.pct);return {r,factor,cost:recipeCostEstimate(r,factor),lines:r.ingredients.split('\n').filter(Boolean).map(line=>scaleLine(line,factor))}}).filter(Boolean);
+ const sum=rows.reduce((n,x)=>n+x.cost.total,0),missing=rows.reduce((n,x)=>n+x.cost.missing,0);
  return `<section class="panel"><h2>${t('shopping')}</h2><p>${esc(e.name)} · ${e.invited.length} guests · ${eq().toFixed(2)} adult-equivalent servings</p>
- <p class="small">Ingredient quantities scale by adult-equivalent attendees divided by each recipe's original servings. This does not include an extra-food buffer or plate percentages; adjust if serving several dishes or planning leftovers. Check unusual yields before shopping.</p>
- ${entries.map(entry=>{let r=recipe(entry.id);if(!r)return '';let factor=recipeMultiplier(r,entry.kind,entry.pct);let lines=r.ingredients.split('\n').filter(Boolean).map(line=>scaleLine(line,factor));
- return `<div class="summary"><h3>${esc(r.name)}</h3><p class="small">${factor.toFixed(2)}× original recipe · Original serves ${r.servings} · Serves ${eq().toFixed(2)} adult-equivalents</p>
- <ul>${lines.map(x=>`<li>${esc(x.line)}${x.numeric?'':' <small class="small">(check manually)</small>'}</li>`).join('')}</ul></div>`}).join('')||'<p>Choose recipes for the menu first.</p>'}
+ <p class="small">Ingredient quantities scale by adult-equivalent attendees divided by each recipe's original servings. No extra-food buffer is included. Prices are rough US grocery planning assumptions, not live store quotes; prices vary by store, brand and package size. Unrecognized ingredients are excluded from estimates.</p>
+ ${rows.length?`<div class="summary"><h3>Estimated grocery budget: ${dollars(sum*0.8)}–${dollars(sum*1.3)}${missing?' + unpriced ingredients':''}</h3><p class="small">Based on ${dollars(sum)} in recognized ingredients across ${rows.length} recipe(s). Includes a rough price-variation range, not tax or a verified checkout total. ${missing?missing+' ingredient line(s) need manual pricing.':''}</p></div>`:''}
+ ${rows.map(({r,factor,cost,lines})=>`<div class="summary"><h3>${esc(r.name)}</h3><p class="small">${factor.toFixed(2)}× original recipe · Original serves ${r.servings} · Serves ${eq().toFixed(2)} adult-equivalents</p>
+ <p><strong>Estimated ingredient cost: ${cost.covered?dollars(cost.total*0.8)+'–'+dollars(cost.total*1.3):'Not available'}</strong>${cost.missing?' <span class="small">('+cost.missing+' unpriced ingredient line(s); estimate incomplete)</span>':''}</p>
+ <ul>${lines.map(x=>`<li>${esc(x.line)}${x.numeric?'':' <small class="small">(check manually)</small>'}</li>`).join('')}</ul></div>`).join('')||'<p>Choose recipes for the menu first.</p>'}
  <button onclick="window.print()">${t('print')}</button></section>`;
 }
 
