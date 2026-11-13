@@ -147,26 +147,29 @@ async function importRecipeFromUrl(btn){
 function saveRecipe(ev){ev.preventDefault();let f=ev.target;let r=editingRecipe==='new'?{id:uid()}:recipe(editingRecipe);Object.assign(r,{name:f.elements.namedItem('rname').value,category:f.elements.namedItem('category').value,servings:Number(f.elements.namedItem('servings').value)||1,portionGrams:Number(f.elements.namedItem('portionGrams').value)||100,ingredients:f.elements.namedItem('ingredients').value,instructions:f.elements.namedItem('instructions').value,url:f.elements.namedItem('url').value,favorite:f.elements.namedItem('favorite').checked});if(editingRecipe==='new')d.recipes.push(r);editingRecipe=null;render()}
 function rFavorite(id){recipe(id).favorite=!recipe(id).favorite;render()}function deleteRecipe(id){if(confirm('Delete recipe?')){d.recipes=d.recipes.filter(r=>r.id!==id);render()}}
 
-function parseQty(token){token=token.trim();if(!token)return null;let parts=token.split(/\s+/),v=0;for(let p of parts){if(/^\d+\/\d+$/.test(p)){let [a,b]=p.split('/').map(Number);v+=a/b}else if(/^\d+(\.\d+)?$/.test(p))v+=Number(p);else return null}return v}
+function parseQty(token){
+ token=token.trim().replace(/[½]/g,' 1/2').replace(/[⅓]/g,' 1/3').replace(/[⅔]/g,' 2/3').replace(/[¼]/g,' 1/4').replace(/[¾]/g,' 3/4').replace(/[⅛]/g,' 1/8');
+ let parts=token.trim().split(/\s+/),v=0;
+ for(let p of parts){if(/^\d+\/\d+$/.test(p)){let [a,b]=p.split('/').map(Number);if(!b)return null;v+=a/b}else if(/^\d+(\.\d+)?$/.test(p))v+=Number(p);else return null}
+ return v;
+}
 function scaleLine(line,factor){
- const match=line.match(/^\s*((?:\d+(?:\.\d+)?(?:\/\d+)?)(?:\s+\d+\/\d+)?)(\s+.*)$/);
+ const match=line.match(/^(\s*)((?:\d+(?:\.\d+)?\s+)?(?:\d+\/\d+|[½⅓⅔¼¾⅛])|\d+(?:\.\d+)?(?:\s+[½⅓⅔¼¾⅛])?)(\s+.*)$/);
  if(!match)return {line,numeric:false};
- let n=parseQty(match[1]);if(n===null)return {line,numeric:false};
- let scaled=n*factor;
- return {line:(Number(scaled.toFixed(2)).toString() + match[2]),numeric:true};
+ let n=parseQty(match[2]);if(n===null)return {line,numeric:false};
+ return {line:match[1]+Number((n*factor).toFixed(2)).toString()+match[3],numeric:true};
 }
 function recipeMultiplier(r,kind,pct){
- let m=currentParty().menu,plates=eq()*(1+m.buffer/100);
- if(kind==='dessert')return plates/Math.max(1,r.servings);
- const requiredGrams=plates*m.grams*pct/100;
- return requiredGrams/(Math.max(1,r.servings)*Math.max(1,r.portionGrams|| (kind==='main'?250:120)));
+ // Recipes list their own serving yields; use those instead of estimated cooked weight.
+ // Plate percentages affect food-weight planning, not recipe ingredient quantities.
+ return eq()/Math.max(1,Number(r.servings)||1);
 }
 function renderShopping(){
  let e=currentParty(),m=e.menu,entries=[{id:m.main,kind:'main',pct:m.pcts[0]},...m.sides.map((id,i)=>({id,kind:'side',pct:m.pcts[i+1]})),{id:m.dessert,kind:'dessert',pct:0}].filter(x=>x.id);
  return `<section class="panel"><h2>${t('shopping')}</h2><p>${esc(e.name)} · ${e.invited.length} guests · ${eq().toFixed(2)} adult-equivalent servings</p>
- <p class="small">Quantities below scale with invited guests, their individual serving factors, plate percentages, extra-food buffer, and the recipe's estimated cooked weight per serving. Dessert uses one recipe portion per adult-equivalent guest. Confirm quantities before shopping, especially when recipes have unusual yields.</p>
+ <p class="small">Ingredient quantities scale by adult-equivalent attendees divided by each recipe's original servings. This does not include an extra-food buffer or plate percentages; adjust if serving several dishes or planning leftovers. Check unusual yields before shopping.</p>
  ${entries.map(entry=>{let r=recipe(entry.id);if(!r)return '';let factor=recipeMultiplier(r,entry.kind,entry.pct);let lines=r.ingredients.split('\n').filter(Boolean).map(line=>scaleLine(line,factor));
- return `<div class="summary"><h3>${esc(r.name)}</h3><p class="small">${factor.toFixed(2)}× original recipe · Original serves ${r.servings} · ${r.portionGrams||(entry.kind==='main'?250:entry.kind==='side'?120:100)} g/serving estimated</p>
+ return `<div class="summary"><h3>${esc(r.name)}</h3><p class="small">${factor.toFixed(2)}× original recipe · Original serves ${r.servings} · Serves ${eq().toFixed(2)} adult-equivalents</p>
  <ul>${lines.map(x=>`<li>${esc(x.line)}${x.numeric?'':' <small class="small">(check manually)</small>'}</li>`).join('')}</ul></div>`}).join('')||'<p>Choose recipes for the menu first.</p>'}
  <button onclick="window.print()">${t('print')}</button></section>`;
 }
